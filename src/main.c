@@ -1,23 +1,23 @@
 #include <zephyr.h>
 #include <device.h>
 #include <drivers/gpio.h>
-#define LED_PORT DT_ALIAS_LED0_GPIOS_CONTROLLER
-#define LED DT_ALIAS_LED0_GPIOS_PIN
 /* 1000 msec = 1 sec */
-#define SLEEP_TIME 1000
+
+const s32_t SLEEP_TIME = 1000;
 
 void main(void)
 {
 	u32_t cnt = 0;
 	struct device *dev;
-	dev = device_get_binding(LED_PORT);
+	dev = device_get_binding("GPIOI");
 	/* Set LED pin as output */
-	gpio_pin_configure(dev, LED, GPIO_DIR_OUT);
+	gpio_pin_configure(dev, 1, GPIO_DIR_OUT);
 	while (1) 
 	{
 		/* Set pin to HIGH/LOW every 1 second */
-		gpio_pin_write(dev, LED, cnt % 2);
+		gpio_pin_write(dev, 1, cnt % 2);
 		cnt++;
+
 		k_msleep(SLEEP_TIME);
 	}
 }
