@@ -1,26 +1,33 @@
 #include <zephyr.h>
 #include <device.h>
+#include <devicetree.h>
 #include <drivers/gpio.h>
-/* 1000 msec = 1 sec */
+#include <sys/printk.h>
 
-const s32_t SLEEP_TIME = 1000;
+#define LED0_NODE   DT_ALIAS(led0)
+#define LED0	    DT_GPIO_LABEL(LED0_NODE, gpios)
+#define LED_PIN	        DT_GPIO_PIN(LED0_NODE, gpios)
+#define FLAGS	    DT_GPIO_FLAGS(LED0_NODE, gpios)
+
+
+#define SW0_NODE    DT_ALIAS(sw0)
+#define SW0	DT_     GPIO_LABEL(SW0_NODE, gpios)
+#define SW0_PIN	    DT_GPIO_PIN(SW0_NODE, gpios)
+#define SW0_FLAGS	DT_GPIO_FLAGS(SW0_NODE, gpios)
 
 void main(void)
 {
-	u32_t cnt = 0;
-	struct device *dev;
-	dev = device_get_binding("GPIOI");
-	/* Set LED pin as output */
-	gpio_pin_configure(dev, 1, GPIO_DIR_OUT);
-	while (1) 
-	{
-		/* Set pin to HIGH/LOW every 1 second */
-		gpio_pin_write(dev, 1, cnt % 2);
-		cnt++;
-
-		k_msleep(SLEEP_TIME);
-	}
+    const struct device *gpio_i = device_get_binding(LED0);
+    gpio_pin_configure(gpio_i, LED_PIN, GPIO_OUTPUT);
+    gpio_pin_configure(gpio_i, SW0_PIN, GPIO_INPUT);
+    while (1)
+    {
+        gpio_pin_toggle(gpio_i, LED_PIN);
+        printk("Hello World!\n");
+        if(gpio_pin_get(gpio_i, SW0_PIN))
+        {
+            printk("Button pressed\n");
+        }
+        k_msleep(500);
+    }
 }
-
-
-
